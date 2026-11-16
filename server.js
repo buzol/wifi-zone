@@ -194,7 +194,7 @@ setInterval(() => {
 
 const COOKIE_SECURE = process.env.COOKIE_SECURE ==="true";
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
 
