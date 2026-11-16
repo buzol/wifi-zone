@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WIFI ZONE NGOUMBA MABI</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f5fa;
+      color: #14213d;
+      text-align: center;
+    }
+    header {
+      background: #071b49;
+      color: white;
+      padding: 25px 10px;
+    }
+    header h1 { margin: 0; font-size: 25px; }
+    main { padding: 25px 15px; }
+    .plans {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+    }
+    .plan {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      width: 230px;
+      box-shadow: 0 4px 14px #00000018;
+    }
+    .price {
+      color: #071b49;
+      font-size: 27px;
+      font-weight: bold;
+    }
+    button {
+      background: #071b49;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 25px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: #123b82; }
+    #payment {
+      display: none;
+      background: white;
+      max-width: 380px;
+      margin: 25px auto;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px #00000018;
+    }
+    .method {
+      margin: 10px 0;
+      background: #eef2f8;
+      color: #071b49;
+    }
+    #message { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>WIFI ZONE NGOUMBA MABI</h1>
+  <p>Connectez-vous. Profitez. Naviguez !</p>
+</header>
+
+<main>
+  <h2>Bienvenue !</h2>
+  <p>Choisissez votre forfait Wi-Fi</p>
+
+  <div class="plans">
+    <div class="plan">
+      <h3>1 HEURE</h3>
+      <p class="price">300 FCFA</p>
+      <button onclick="acheter('1 heure', 300)">ACHETER</button>
+    </div>
+
+    <div class="plan">
+      <h3>2 HEURES</h3>
+      <p class="price">500 FCFA</p>
+      <button onclick="acheter('2 heures', 500)">ACHETER</button>
+    </div>
+
+    <div class="plan">
+      <h3>3 HEURES</h3>
+      <p class="price">1 000 FCFA</p>
+      <button onclick="acheter('3 heures', 1000)">ACHETER</button>
+    </div>
+  </div>
+
+  <section id="payment">
+    <h2>Confirmation du forfait</h2>
+    <p id="selected"></p>
+    <p>Choisissez votre moyen de paiement :</p>
+    <button class="method" onclick="payer('Orange Money')">
+      ORANGE MONEY
+    </button>
+    <button class="method" onclick="payer('MTN Mobile Money')">
+      MTN MOBILE MONEY
+    </button>
+    <label for="telephone">Numéro Mobile Money :</label>
+
+<input
+  type="tel"
+  id="telephone"
+  placeholder="+237 6XXXXXXXX"
+  required
+  style="width:100%; padding:12px; margin:10px 0; box-sizing:border-box;"
+>
+    <p id="message"></p>
+  </section>
+</main>
+
+<script>
+  let forfaitChoisi = "";
+  let montantChoisi = 0;
+
+  // Récupérer les paramètres transmis par Omada
+  function obtenirConnexion() {
+    const parametres = new URLSearchParams(
+      window.location.search
+    );
+
+    const champs = [
+      "clientMac",
+      "clientIp",
+      "apMac",
+      "ssidName",
+      "radioId",
+      "site",
+      "redirectUrl",
+      "gatewayMac",
+      "vid",
+      "t"
+    ];
+
+    const connexion = {};
+
+    champs.forEach(champ => {
+      connexion[champ] = parametres.get(champ) || "";
+    });
+
+    return connexion;
+  }
+
+  function acheter(nom, montant) {
+    forfaitChoisi = nom;
+    montantChoisi = montant;
+
+    document.getElementById("selected").textContent =
+      "Forfait : " + nom + " — " + montant + " FCFA";
+
+    document.getElementById("message").textContent = "";
+    document.getElementById("payment").style.display = "block";
+
+    document.getElementById("payment").scrollIntoView({
+      behavior: "smooth"
+    });
+  }
+
+async function payer(moyen) {
+  const message = document.getElementById("message");
+  const telephone = document.getElementById("telephone").value.trim();
+
+  if (!/^\+237[2368]\d{8}$/.test(telephone)) {
+    message.textContent = "Entre un numéro camerounais valide au format +237XXXXXXXXX.";
+    return;
+  }
+
+  message.textContent = "Traitement de la demande...";
+
+  try {
+    const reponse = await fetch("/api/paiement", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        forfait: forfaitChoisi,
+        montant: montantChoisi,
+        moyen: moyen,
+        telephone: telephone,
+        connexion: obtenirConnexion()
+      })
+    });
+
+    const resultat = await reponse.json();
+
+    if (!reponse.ok || !resultat.succes) {
+      message.textContent = resultat.message || "Erreur de paiement.";
+      return;
+    }
+
+    message.textContent = "Redirection vers Notch Pay...";
+    window.location.href = resultat.authorization_url;
+
+  } catch (erreur) {
+    console.error(erreur);
+    message.textContent =
+      "Impossible de contacter le serveur. Vérifie qu'il est démarré.";
+  }
+}
+
+
+</script>
+
+
+
+
+
+</body>
+</html>
+

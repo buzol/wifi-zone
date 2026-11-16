@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administration WIFI ZONE</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    background: #071426;
+    color: white;
+}
+
+.login {
+    width: 90%;
+    max-width: 380px;
+    padding: 35px 25px;
+    background: #10243d;
+    border-radius: 15px;
+    text-align: center;
+}
+
+h2 { color: white; }
+
+input, button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+    border-radius: 8px;
+}
+
+input {
+    border: 1px solid #52647a;
+    background: #fff;
+    color: #071426;
+}
+
+button {
+    border: none;
+    background: white;
+    color: #071426;
+    font-weight: bold;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="login">
+    <h2>WIFI ZONE</h2>
+    <p>NGOUMBA MABI</p>
+    <p>Espace administrateur sécurisé</p>
+
+    <form action="/admin-login" method="POST">
+        <input
+            type="text"
+            name="username"
+            placeholder="Identifiant administrateur"
+            autocomplete="username"
+            required
+        >
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Mot de passe"
+            autocomplete="current-password"
+            required
+        >
+
+        <button type="submit">SE CONNECTER</button>
+    </form>
+</div>
+</body>
+</html>
+
